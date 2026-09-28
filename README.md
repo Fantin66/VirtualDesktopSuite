@@ -1,6 +1,6 @@
 # Virtual Desktop Suite
 
-A single-process Windows 11 virtual desktop companion that combines three
+A single-process Windows 11 virtual desktop companion that combines several
 tools into one:
 
 1. **Taskbar desktop strip** — numbered pills for every virtual desktop,
@@ -10,15 +10,30 @@ tools into one:
 3. **Maximize to a new virtual desktop** — hold a modifier key while
    maximizing a window (or press a hotkey) to send it to its own temporary
    desktop, then get it back automatically.
+4. **Edge-reveal fallback + clock overlay** — when Explorer refuses to
+   auto-hide the taskbar, hide it anyway and bring it back by touching the
+   bottom screen edge; while it is hidden, draw the clock where the taskbar
+   used to be.
 
-The three are designed to interlock: the temporary desktops created by (3) are
+They are designed to interlock: the temporary desktops created by (3) are
 named `[MVD] <ProcessName>`, and (1) reads that name to display the app name
-instead of a number, while optionally hiding the taskbar for a full-screen
-feel. Leaving the desktop restores everything.
+instead of a number, while (4) hides the taskbar for a full-screen feel and
+takes over the clock. Leaving the desktop restores everything.
 
 > Status: **experimental / personal project.** It works on the author's
 > machine and has a fairly large automated verification suite, but it has not
 > been tested broadly. Expect rough edges.
+>
+> The prebuilt release is the **edge build** (`desktop_suite_edge.py`), which
+> is item (4) layered on top of the main line. To run the main line only, run
+> `desktop_suite.py` instead.
+
+![The desktop pills in every state, and the settings panel in both themes](docs/pills-and-menu.png)
+
+*Design reference sheet: the pills in every state (current desktop, other
+desktop, app-name desktop, hover, pressed, over-long label) and the settings
+panel in dark and light themes. Annotations are in Chinese. The edge build's
+clock overlay is not shown here.*
 
 ---
 
@@ -59,6 +74,25 @@ feel. Leaving the desktop restores everything.
 - Restores the window and removes the temporary desktop on un-maximize,
   close, or pressing the hotkey again.
 
+### 4. Edge-reveal fallback + clock overlay
+
+Explorer gets the first chance to hide the taskbar by itself. Only if the
+taskbar is still expanded a moment later, with the pointer nowhere near it,
+does the suite step in:
+
+- **Edge reveal** — the taskbar is hidden directly, and brought back by
+  pushing the cursor into the bottom 5 px of the screen. It slides away again
+  once the cursor leaves.
+- **Clock overlay** — while the taskbar is hidden, a click-through layered
+  window draws the time and date where the taskbar's clock would have been.
+  It reads the system's own short time/date formats, so it matches whatever
+  the user configured, and samples the background underneath to choose a
+  light or dark text colour. It hands back to the real clock as the taskbar
+  slides in.
+
+Both are part of the edge build only. They are the newest and least-tested
+part of the project.
+
 ---
 
 ## Usage
@@ -78,13 +112,16 @@ toggle.
 ```
 source/
 ├── desktop_suite.py          Core: virtual desktops, hotkeys, taskbar toggle,
-│                             the maximize-to-desktop logic, LAF shell
-├── desktop_suite_edge.py     Experimental entry point: edge-reveal taskbar
-│                             and a clock face on the strip
+│                             the maximize-to-desktop logic. Runnable on its
+│                             own (`python source/desktop_suite.py`)
+├── desktop_suite_edge.py     **The shipped entry point.** Subclasses the core
+│                             and adds the edge-reveal fallback and the clock
+│                             overlay. Supports `--probe` for a quick
+│                             start-and-exit check
 ├── suite_ui.py               Pure rendering (Pillow): pills, menu, geometry.
 │                             No system calls — renderable offline to PNG
-├── layered_pill.py           Small Win32 per-pixel-alpha window used for the
-│                             floating strip
+├── layered_pill.py           Small Win32 per-pixel-alpha window used by the
+│                             floating strip and the clock overlay
 ├── tray_watchdog.cs          Tiny C# helper: if the suite dies while the
 │                             taskbar is force-hidden, restore the taskbar
 │                             (`tray_watchdog.exe`)
@@ -137,13 +174,15 @@ distributions ship without it.
 Packaging into a single `.exe`:
 
 ```bat
-python source\build_exe.py                REM -> VirtualDesktopSuite.exe
-python source\build_exe.py <entry> <name> REM custom entry script and output name
+python source\build_exe.py                                    REM main line
+python source\build_exe.py desktop_suite_edge.py VirtualDesktopSuite-edge
+                                                              REM edge build
 ```
 
 The build script pins the icon, the vendored `libs/` path handling, and a
-slimming exclusion list. It expects PyInstaller to be available; adjust the
-`pyi_env` path or install it into your environment.
+slimming exclusion list (which takes the output from ~30 MB to ~13 MB). It
+expects PyInstaller to be available; adjust the `pyi_env` path or install it
+into your own environment.
 
 ---
 
