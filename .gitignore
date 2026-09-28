@@ -1,0 +1,36 @@
+# Build artifacts and vendored dependencies
+build/
+dist/
+build_tmp/
+build_mini/
+dist_mini/
+pyi_env/
+__pycache__/
+*.pyc
+
+# Vendored third-party source (do NOT redistribute via git;
+# licenses are reproduced in THIRD-PARTY-NOTICES.md)
+libs/
+wheels/
+
+# Compiled executables (ship via GitHub Releases, not git)
+*.exe
+
+# Local runtime state and logs
+*.log
+suite_settings.json
+vd_settings.json
+*.marker
+
+# Preview / QA images
+预览-*.png
+_*.png
+
+# Archives and internal notes
+_archive/
+优化排查与实施计划.md
+
+# OS noise
+Thumbs.db
+desktop.ini
+.DS_Store

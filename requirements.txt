@@ -1,0 +1,17 @@
+# Runtime dependencies.
+#
+# Running from source: pip install -r requirements.txt
+# The released .exe is self-contained and bundles these already.
+#
+# NOTE: the virtual desktop layer depends on pyvda, which talks to
+# undocumented Windows COM interfaces. See THIRD-PARTY-NOTICES.md.
+
+pyvda==0.6.0
+Pillow==12.3.0
+comtypes==1.4.16
+
+# Packaging only (not needed to run from source)
+# pyinstaller==6.22.3
+# pywin32-ctypes==0.2.3
+# pefile==2024.8.26
+# altgraph==0.17.5
