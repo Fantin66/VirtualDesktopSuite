@@ -2,14 +2,11 @@
 """build_exe.py — 把入口脚本打包成单个 exe
 
 用法：
-    python source\\build_exe.py
-    python source\\build_exe.py <入口脚本> <成品名>
+    "C:\\Program Files\\Python312\\python.exe" source\\build_exe.py
+    "C:\\Program Files\\Python312\\python.exe" source\\build_exe.py <入口脚本> <成品名>
 
-不带参数时打的是 desktop_suite.py → VirtualDesktopSuite.exe。
-
-⚠️ 必须用**带 tkinter 的解释器**跑（本机是 C:\\Program Files\\Python312）。
-   托管环境自带的 3.13 没编 tkinter，打包会缺模块。
-⚠️ 依赖 PyInstaller，见 source/pyi_env/（离线版）；不在这里会去 pip 找。
+不带参数时打的是 vd_bar_v6.py → VirtualDesktopBar.exe（预览条单品）。
+集成版：build_exe.py desktop_suite.py VirtualDesktopSuite
 
 流程：
     1) 调用 make_icon.py 生成 vd_bar.ico
@@ -42,9 +39,9 @@ ICON = os.path.join(HERE, "vd_bar.ico")
 TRAY_WATCHDOG_SOURCE = os.path.join(HERE, "tray_watchdog.cs")
 TRAY_WATCHDOG_EXE = os.path.join(HERE, "tray_watchdog.exe")
 
-# 入口脚本 与 成品名：可用命令行参数覆盖
-_ENTRY_FILE = sys.argv[1] if len(sys.argv) > 1 else "desktop_suite.py"
-_NAME = sys.argv[2] if len(sys.argv) > 2 else "VirtualDesktopSuite"
+# 入口脚本 与 成品名：可用命令行参数覆盖，默认打预览条单品
+_ENTRY_FILE = sys.argv[1] if len(sys.argv) > 1 else "vd_bar_v6.py"
+_NAME = sys.argv[2] if len(sys.argv) > 2 else "VirtualDesktopBar"
 ENTRY = os.path.join(HERE, _ENTRY_FILE)
 NAME = _NAME
 
